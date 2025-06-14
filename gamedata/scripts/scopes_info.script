@@ -1,7 +1,7 @@
 local cache = {}
 
 function on_game_start()
-    --cache_scopes_info()
+    cache_scopes_info()
 end
 
 function cache_scopes_info()
