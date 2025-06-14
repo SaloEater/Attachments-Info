@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+    <string id="st_scopes_info_rifles">
+        <text>Rifles</text>
+    </string>
+    <string id="st_scopes_info_pistols">
+        <text>Pistols</text>
+    </string>
+    <string id="st_scopes_info_shotguns">
+        <text>Shotguns</text>
+    </string>
+    <string id="st_scopes_info_smgs">
+        <text>SMG</text>
+    </string>
+    <string id="st_scopes_info_snipers">
+        <text>Sniper Rifles</text>
+    </string>
+    <string id="st_scopes_info_unknown">
+        <text>Unknown</text>
+    </string>
+    <string id="st_scopes_info_explosives">
+        <text>Explosives</text>
+    </string>
+    <string id="st_scopes_info_compatible_weapons">
+        <text>COMPATIBLE WEAPONS</text>
+    </string>
+</string_table>

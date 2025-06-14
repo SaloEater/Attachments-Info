@@ -1,0 +1,122 @@
+local cache = {}
+
+function on_game_start()
+    --cache_scopes_info()
+end
+
+function cache_scopes_info()
+    local weapon_kinds = {
+        ["w_pistol"]    = "st_scopes_info_pistols",
+        ["w_shotgun"]   = "st_scopes_info_shotguns",
+        ["w_smg"]       = "st_scopes_info_smgs",
+        ["w_rifle"]     = "st_scopes_info_rifles",
+        ["w_sniper"]    = "st_scopes_info_snipers",
+        ["w_explosive"]    = "st_scopes_info_explosives",
+    }
+
+    local attachments_map = {}
+    local kind_color = "%c[0,0,150,0]"
+    local weapons_color = "%c[ui_gray_2]"
+
+    ini_sys:section_for_each(function(weapon)
+        local kind = ini_sys:r_string_ex(weapon,"kind")
+        if kind and weapon_kinds[kind] then
+            local weapon_class = ini_sys:r_string_ex(weapon, "weapon_class")
+            if kind == "w_explosive" and (not weapon_class or weapon_class == "") then
+                return
+            end
+
+            local parent_section = ini_sys:r_string_ex(weapon, "parent_section")
+            if parent_section and weapon ~= parent_section then
+                return
+            end
+
+            local scopes_all = ini_sys:r_string_ex(weapon, "scopes")
+            if scopes_all then
+                local scopes = str_explode(scopes_all, ",")
+                for i = 1, #scopes do
+                    local scope = scopes[i]
+                    if attachments_map[scope] == nil then
+                        attachments_map[scope] = {}
+                    end
+
+                    attachments_map[scope][weapon] = true
+                end
+            end
+
+            local silencer = ini_sys:r_string_ex(weapon, "silencer_name")
+            if silencer then
+                if attachments_map[silencer] == nil then
+                    attachments_map[silencer] = {}
+                end
+
+                attachments_map[silencer][weapon] = true
+            end
+
+            local gl = ini_sys:r_string_ex(weapon, "grenade_launcher_name")
+            if gl then
+                if attachments_map[gl] == nil then
+                    attachments_map[gl] = {}
+                end
+
+                attachments_map[gl][weapon] = true
+            end
+
+            local single_scope = ini_sys:r_string_ex(weapon, "scope_name")
+            if single_scope then
+                if attachments_map[single_scope] == nil then
+                    attachments_map[single_scope] = {}
+                end
+
+                attachments_map[single_scope][weapon] = true
+            end
+        end
+    end)
+
+    local sortAlphabetically = function(t, a, b) return t[a] < t[b] end
+    for attachment, weapons in pairs(attachments_map) do
+        local kinds = {}
+
+        for weapon, _ in pairs(weapons) do
+            local kind = ini_sys:r_string_ex(weapon, "kind")
+            if kinds[kind] == nil then
+                kinds[kind] = {}
+            end
+            kinds[kind][weapon] = true
+        end
+
+        local weapons_line = ""
+
+        for kind, weapons in pairs(kinds) do
+            local kind_name_st = weapon_kinds[kind] or "st_scopes_info_unknown"
+            local kind_name = game.translate_string(kind_name_st)
+
+            local kind_line = kind_color .. kind_name .. ": " .. weapons_color
+            local weapon_names = {}
+            for weapon, _ in pairs(weapons) do
+                local weapon_name_st = ini_sys:r_string_ex(weapon, "inv_name")
+                local weapon_name = game.translate_string(weapon_name_st)
+                weapon_names[weapon_name] = weapon_name
+            end
+
+            for weapon_name, _ in spairs(weapon_names, sortAlphabetically) do
+                kind_line = kind_line .. weapon_name .. ", "
+            end
+
+            weapons_line = weapons_line .. kind_line:sub(1, -3) .. "\\n \\n"
+        end
+
+        cache[attachment] = "\\n \\n%c[0,255,100,0]" .. game.translate_string("st_scopes_info_compatible_weapons") .. ":\\n \\n" .. weapons_line
+    end
+end
+
+original_build_desc_header = ui_item.build_desc_header
+function ui_item.build_desc_header(obj, sec, str)
+    local _str2 = original_build_desc_header(obj, sec, str)
+
+    if cache[sec] then
+        _str2 = _str2 .. cache[sec]
+    end
+
+    return _str2
+end

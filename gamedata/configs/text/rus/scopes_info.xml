@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+    <string id="st_scopes_info_rifles">
+        <text>Винтовки</text>
+    </string>
+    <string id="st_scopes_info_pistols">
+        <text>Пистолеты</text>
+    </string>
+    <string id="st_scopes_info_shotguns">
+        <text>Дробовики</text>
+    </string>
+    <string id="st_scopes_info_smgs">
+        <text>ПП</text>
+    </string>
+    <string id="st_scopes_info_snipers">
+        <text>Снайперские винтовки</text>
+    </string>
+    <string id="st_scopes_info_unknown">
+        <text>Неизвестно</text>
+    </string>
+    <string id="st_scopes_info_explosives">
+        <text>Устройства</text>
+    </string>
+    <string id="st_scopes_info_compatible_weapons">
+        <text>СОВМЕСТИМОЕ ОРУЖИЕ</text>
+    </string>
+</string_table>
