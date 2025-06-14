@@ -1,0 +1,23 @@
+function overwrite_get_scopes_all()
+    local old_get_scopes_all = attachments_info.get_scopes_all
+    attachments_info.get_scopes_all = function (weapon)
+        local isModular = ini_sys:r_bool_ex(weapon,"modular_attachments",false)
+        if not isModular then
+            return old_get_scopes_all(weapon)
+        end
+
+        local attachments_map = {}
+        local modular_scope_group = ini_sys:r_string_ex(weapon, "modular_scope_group")
+        local scopes = parse_list(ini_sys, modular_scope_group, "scopes")
+        for i=1, #scopes do
+            attachments_map[scopes[i]] = attachments_map[scopes[i]] or {}
+            attachments_map[scopes[i]][weapon] = true
+        end
+        return attachments_map
+    end
+end
+
+local mas_group_none = ini_sys:r_string_ex("scope_group_none", "scopes")
+if mas_group_none then
+    overwrite_get_scopes_all()
+end

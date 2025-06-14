@@ -1,17 +1,38 @@
 local cache = {}
 
 function on_game_start()
-    --cache_scopes_info()
+    cache_attachments_info()
 end
 
-function cache_scopes_info()
+function get_scopes_all(weapon)
+    local attachments_map = {}
+    local scopes_all = ini_sys:r_string_ex(weapon, "scopes")
+    if scopes_all then
+        local scopes = str_explode(scopes_all, ",")
+        for i = 1, #scopes do
+            local scope = scopes[i]
+            if attachments_map[scope] == nil then
+                attachments_map[scope] = {}
+            end
+
+            attachments_map[scope][weapon] = true
+        end
+    end
+    return attachments_map
+end
+
+function get_single_scope(weapon)
+    return ini_sys:r_string_ex(weapon, "scope_name")
+end
+
+function cache_attachments_info()
     local weapon_kinds = {
-        ["w_pistol"]    = "st_scopes_info_pistols",
-        ["w_shotgun"]   = "st_scopes_info_shotguns",
-        ["w_smg"]       = "st_scopes_info_smgs",
-        ["w_rifle"]     = "st_scopes_info_rifles",
-        ["w_sniper"]    = "st_scopes_info_snipers",
-        ["w_explosive"]    = "st_scopes_info_explosives",
+        ["w_pistol"]    = "st_attachments_info_pistols",
+        ["w_shotgun"]   = "st_attachments_info_shotguns",
+        ["w_smg"]       = "st_attachments_info_smgs",
+        ["w_rifle"]     = "st_attachments_info_rifles",
+        ["w_sniper"]    = "st_attachments_info_snipers",
+        ["w_explosive"]    = "st_attachments_info_explosives",
     }
 
     local attachments_map = {}
@@ -31,16 +52,14 @@ function cache_scopes_info()
                 return
             end
 
-            local scopes_all = ini_sys:r_string_ex(weapon, "scopes")
-            if scopes_all then
-                local scopes = str_explode(scopes_all, ",")
-                for i = 1, #scopes do
-                    local scope = scopes[i]
-                    if attachments_map[scope] == nil then
-                        attachments_map[scope] = {}
-                    end
+            local scopes_map = get_scopes_all(weapon)
+            for scope, weapons in pairs(scopes_map) do
+                if attachments_map[scope] == nil then
+                    attachments_map[scope] = {}
+                end
 
-                    attachments_map[scope][weapon] = true
+                for w, _ in pairs(weapons) do
+                    attachments_map[scope][w] = true
                 end
             end
 
@@ -62,7 +81,7 @@ function cache_scopes_info()
                 attachments_map[gl][weapon] = true
             end
 
-            local single_scope = ini_sys:r_string_ex(weapon, "scope_name")
+            local single_scope = get_single_scope(weapon)
             if single_scope then
                 if attachments_map[single_scope] == nil then
                     attachments_map[single_scope] = {}
@@ -88,7 +107,7 @@ function cache_scopes_info()
         local weapons_line = ""
 
         for kind, weapons in pairs(kinds) do
-            local kind_name_st = weapon_kinds[kind] or "st_scopes_info_unknown"
+            local kind_name_st = weapon_kinds[kind] or "st_attachments_info_unknown"
             local kind_name = game.translate_string(kind_name_st)
 
             local kind_line = kind_color .. kind_name .. ": " .. weapons_color
@@ -106,7 +125,7 @@ function cache_scopes_info()
             weapons_line = weapons_line .. kind_line:sub(1, -3) .. "\\n \\n"
         end
 
-        cache[attachment] = "\\n \\n%c[0,255,100,0]" .. game.translate_string("st_scopes_info_compatible_weapons") .. ":\\n \\n" .. weapons_line
+        cache[attachment] = "\\n \\n%c[0,255,100,0]" .. game.translate_string("st_attachments_info_compatible_weapons") .. ":\\n \\n" .. weapons_line
     end
 end
 
